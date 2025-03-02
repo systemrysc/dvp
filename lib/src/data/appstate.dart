@@ -63,6 +63,9 @@ class AppState extends ChangeNotifier {
   directionsUpdate(Directions directions){
     
     try{
+      final index = _directions.indexWhere((item)=>item.id==directions.id && item.direction.contains(directions.direction));
+      if (index!=-1) return;
+      
       _directions.add(directions);
       _directionsSave();
     }catch(e){
@@ -100,8 +103,8 @@ class AppState extends ChangeNotifier {
      return data.direction;
   }
 
-  List<Directions> getDirectionById(int id){
-     return _directions.where((item)=> item.id==id).toList();
-    
+  List<String> getDirectionById(int id){
+     final data= _directions.where((item)=> item.id==id).toList();
+     return data.map((item)=>item.direction).toList();
   }
 }

@@ -8,23 +8,21 @@ import 'package:provider/provider.dart';
 //[]
 
 class UsersPage extends StatefulWidget {
-  const UsersPage({super.key});
+  const UsersPage({super.key, this.users});
+  final Users? users;
 
   @override
   State<UsersPage> createState() => _UsersPageState();
 }
 
 class _UsersPageState extends State<UsersPage> {
-  
   final _formKey = GlobalKey<FormState>();
   late int _id;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _directionController = TextEditingController();
-  final List<String> directions = [];
-
-  
+  List<String> directions = [];
 
   DateTime? selectedDate;
 
@@ -49,8 +47,17 @@ class _UsersPageState extends State<UsersPage> {
   void initState() {
     super.initState();
     _id = DateTime.now().microsecondsSinceEpoch;
+
+    if (widget.users==null) return;
+
+    _nameController.text = widget.users!.name;
+    _lastnameController.text = widget.users!.lastname;
+    _dateController.text = widget.users!.date;
+    _id = widget.users!.id; 
+    directions = Provider.of<AppState>(context,listen: false).getDirectionById(_id);      
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +134,7 @@ class _UsersPageState extends State<UsersPage> {
                                   )) {
                                 setState(() {
                                   directions.add(_directionController.text);
-                                  _directionController.text="";
+                                  _directionController.text = "";
                                 });
                               }
                             },
@@ -170,17 +177,20 @@ class _UsersPageState extends State<UsersPage> {
           }
 
           final user = Users(
-            id:_id,
+            id: _id,
             name: _nameController.text.trim(),
             lastname: _lastnameController.text.trim(),
             date: _dateController.text.trim(),
             direction: _directionController.text.trim(),
           );
           Provider.of<AppState>(context, listen: false).userUpdate(user);
-          for (final item in directions){
-               Provider.of<AppState>(context,listen: false).directionsUpdate(Directions(id: _id, direction: item));
+          for (final item in directions) {
+            Provider.of<AppState>(
+              context,
+              listen: false,
+            ).directionsUpdate(Directions(id: _id, direction: item));
           }
-                      
+
           Navigator.pop(context);
         },
       ),
